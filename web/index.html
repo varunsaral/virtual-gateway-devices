@@ -1,0 +1,133 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Edge Device Simulator (Modbus TCP)</title>
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+  <div class="app-container">
+    <!-- Header -->
+    <header class="app-header">
+      <div class="logo-group">
+        <span class="badge-wasm" style="background: linear-gradient(135deg, #10b981, #06b6d4);">Modbus TCP Live</span>
+        <h1>Virtual Edge Gateway & Device Simulator</h1>
+      </div>
+      <div class="header-actions">
+        <button class="btn btn-primary" id="btn-open-add-device">➕ Add Device</button>
+        <div class="header-status">
+          <span class="status-indicator" id="wasm-status-dot"></span>
+          <span id="wasm-status-text">Connecting to Simulator API...</span>
+        </div>
+      </div>
+    </header>
+
+    <!-- Add Device Modal -->
+    <div class="modal-overlay" id="add-device-modal" style="display: none;">
+      <div class="modal-card">
+        <div class="modal-header">
+          <h3>➕ Add Simulated Device</h3>
+          <button class="btn-close" id="btn-close-modal">✕</button>
+        </div>
+        <form id="form-add-device">
+          <div class="form-group">
+            <label for="new-device-type">Device Type:</label>
+            <select id="new-device-type" required>
+              <option value="energy_meter">⚡ Electrical Energy Meter</option>
+              <option value="hvac">❄️ HVAC Thermostat</option>
+            </select>
+          </div>
+          <div class="form-group">
+            <label for="new-device-slave">Modbus Slave ID:</label>
+            <input type="number" id="new-device-slave" min="1" max="247" value="3" required>
+          </div>
+          <div class="form-group">
+            <label for="new-device-path">Stream Point Path Prefix:</label>
+            <input type="text" id="new-device-path" value="/gateway-01/meter-03" placeholder="/gateway-01/meter-03" required>
+          </div>
+          <div class="modal-actions">
+            <button type="button" class="btn btn-secondary" id="btn-cancel-add-device">Cancel</button>
+            <button type="submit" class="btn btn-primary" id="btn-submit-add-device">Create Device</button>
+          </div>
+        </form>
+      </div>
+    </div>
+
+    <!-- Main Grid -->
+    <main class="dashboard-grid">
+      <!-- Dynamic Devices Container -->
+      <div id="devices-container" style="display: contents;"></div>
+
+      <!-- VIRTUAL EDGE GATEWAY CLOUD CONNECTOR -->
+      <section class="device-card full-width" id="card-gateway">
+        <div class="card-header">
+          <div class="title-with-led">
+            <span class="led led-purple"></span>
+            <h2>☁️ Virtual Edge Gateway (HTTPS Platform Sync)</h2>
+          </div>
+          <span class="device-id-badge">Edge Gateway Agent</span>
+        </div>
+
+        <div class="gateway-body">
+          <div class="gateway-config">
+            <div class="form-group">
+              <label for="gateway-id">Gateway ID:</label>
+              <input type="text" id="gateway-id" value="edge-gw-simulator-01">
+            </div>
+
+            <div class="form-group flex-2">
+              <label for="endpoint-url">Target URL (url):</label>
+              <input type="url" id="endpoint-url" placeholder="https://your-platform.com/api/v1/telemetry">
+            </div>
+
+            <div class="form-group">
+              <label for="platform-key">Access Key (key):</label>
+              <input type="text" id="platform-key" value="demo-api-key-01" placeholder="API Key / Token">
+            </div>
+
+            <div class="form-group">
+              <label for="sync-interval-sec">Sync Period (Seconds):</label>
+              <div class="sync-input-row">
+                <input type="number" id="sync-interval-sec" value="5" min="1" max="86400" step="1" placeholder="Sec">
+                <select id="sync-preset-select">
+                  <option value="" disabled selected>Presets</option>
+                  <option value="1">1s</option>
+                  <option value="2">2s</option>
+                  <option value="5">5s</option>
+                  <option value="10">10s</option>
+                  <option value="30">30s</option>
+                  <option value="60">60s (1 min)</option>
+                  <option value="120">120s (2 min)</option>
+                  <option value="300">300s (5 min)</option>
+                </select>
+              </div>
+            </div>
+
+            <div class="form-actions">
+              <button class="btn btn-primary" id="btn-sync-toggle">
+                Start Platform Sync
+              </button>
+            </div>
+          </div>
+
+          <!-- Live Telemetry JSON Preview -->
+          <div class="json-preview-box">
+            <div class="json-header">
+              <span>Live Outgoing Telemetry Packet (Current Second)</span>
+              <span class="json-time" id="payload-timestamp">--:--:--</span>
+            </div>
+            <pre id="json-display">Connecting to Simulator API...</pre>
+          </div>
+        </div>
+      </section>
+    </main>
+
+    <footer class="app-footer">
+      <p>Real-time Modbus TCP telemetry powered by FastAPI and pymodbus.</p>
+    </footer>
+  </div>
+
+  <script src="app.js"></script>
+</body>
+</html>
